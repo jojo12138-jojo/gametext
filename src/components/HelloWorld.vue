@@ -1,57 +1,81 @@
 <template>
   <div class="hello">
-    <h1 class="font-semibold text-4xl text-purple-700">{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+    <div class="aa" ref="aa">
+    </div>
   </div>
 </template>
 
 <script>
+import tween from '@tweenjs/tween.js'
+import * as THREE from 'three'
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { TrackballControls } from "three/examples/jsm/controls/TrackballControls.js";
+import { CSS3DRenderer,CSS3DObject } from "three/examples/jsm/renderers/CSS3DRenderer.js"
+import screenfull from 'screenfull';
+
 export default {
   name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+  data() {
+    return {}
+  },
+  mounted() {
+    this.init()
+  },
+  computed: {},
+  methods: {
+    init() {
+      // 创建场景对象scene
+      let scene = new THREE.Scene();
+
+      // 创建网络模型
+      let geometry = new THREE.BoxGeometry(100, 120, 200); // 创建一个立方体几何对象Geometry
+      let material = new THREE.MeshLambertMaterial({ // 材质对象Material
+        color: 0x0000ff
+      }); 
+      let mesh = new THREE.Mesh(geometry, material); // 网络模型对象mesh
+      scene.add(mesh); // 网络模型添加到场景中
+
+      // 光源设置
+      let point = new THREE.PointLight(0xffffff); // 点光源
+      point.position.set(400, 200, 300); // 点光源位置
+      scene.add(point); // 点光源添加到场景中
+      let ambient = new THREE.AmbientLight(0x444444); // 环境光
+      scene.add(ambient);
+
+      // 相机设置
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      let k = width / height; //窗口宽高比
+      let s = 200; //三维场景显示范围控制系数，系数越大，显示的范围越大
+      let camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000); // 创建相机对象
+      camera.position.set(200, 300, 200); //设置相机位置
+      camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
+
+      // 创建渲染器对象
+      let renderer = new THREE.WebGLRenderer();
+      renderer.setSize(width, height);//设置渲染区域尺寸
+      renderer.setClearColor(0xb9d3ff, 0.5); //设置背景颜色
+      this.$refs.aa.appendChild(renderer.domElement); //元素中插入canvas对象
+
+      //执行渲染操作   指定场景、相机作为参数
+      renderer.render(scene, camera);
+
+      // 旋转动画
+      function aa() {
+        renderer.render(scene, camera);
+        mesh.rotateY(0.01);
+        requestAnimationFrame(aa)
+      }
+      // aa();
+    }
+  },
 }
+// 
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+<style lang="less" scoped>
+.hello {
+  height: 100%;
+  width: 100%;
 }
 </style>
