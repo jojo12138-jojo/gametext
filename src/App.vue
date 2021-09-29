@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <HelloWorld/>
+    <sandxiangce/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import sandxiangce from './components/sandxiangce.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    sandxiangce
   },
   mounted() {
   },

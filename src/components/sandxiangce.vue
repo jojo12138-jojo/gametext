@@ -6,15 +6,15 @@
 </template>
 
 <script>
-import tween from '@tweenjs/tween.js'
 import * as THREE from 'three'
+import tween from '@tweenjs/tween.js'
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls.js";
 import { CSS3DRenderer,CSS3DObject } from "three/examples/jsm/renderers/CSS3DRenderer.js"
 import screenfull from 'screenfull';
 
 export default {
-  name: 'HelloWorld',
+  name: 'sandxiangce',
   data() {
     return {}
   },
@@ -58,15 +58,24 @@ export default {
       this.$refs.aa.appendChild(renderer.domElement); //元素中插入canvas对象
 
       //执行渲染操作   指定场景、相机作为参数
-      renderer.render(scene, camera);
+      function rend() {  // 渲染
+        renderer.render(scene, camera); 
+      }
+      rend()
+      let controls = new OrbitControls(camera, renderer.domElement); //创建控件对象
+      controls.addEventListener('change', rend)
 
       // 旋转动画
-      function aa() {
-        renderer.render(scene, camera);
-        mesh.rotateY(0.01);
-        requestAnimationFrame(aa)
+      let t0 = new Date(); // 上次时间
+      function begin() {
+        let t1 = new Date(); // 本次时间
+        let t = t1 - t0; // 时间差
+        t0 = t1 // 把本次时间赋值给上次时间
+        requestAnimationFrame(begin)
+        renderer.render(scene, camera); // 执行渲染
+        mesh.rotateY(0.001 * t);
       }
-      // aa();
+      // begin(); // 执行转动 
     }
   },
 }
