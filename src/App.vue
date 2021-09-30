@@ -1,16 +1,22 @@
 <template>
   <div id="app">
-    <sandxiangce/>
+    <!-- <sandxiangce/> -->
+    <!-- <beginthreed/> -->
+    <logo/>
   </div>
 </template>
 
 <script>
 import sandxiangce from './components/sandxiangce.vue'
+import beginthreed from './components/beginthreed.vue'
+import logo from './components/logo.vue'
 
 export default {
   name: 'app',
   components: {
-    sandxiangce
+    sandxiangce,
+    beginthreed,
+    logo,
   },
   mounted() {
   },
@@ -25,7 +31,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  margin: 0px;
+  padding: 0px;
 }
 </style>
