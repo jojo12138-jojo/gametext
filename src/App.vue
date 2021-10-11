@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <!-- <sandxiangce/> -->
-    <!-- <beginthreed/> -->
-    <logo/>
+    <beginthreed/>
+    <!-- <logo/> -->
   </div>
 </template>
 
