@@ -1,14 +1,16 @@
 <template>
   <div id="app">
     <!-- <sandxiangce/> -->
-    <beginthreed/>
+    <!-- <beginthreed/> -->
     <!-- <logo/> -->
+    <index/>
   </div>
 </template>
 
 <script>
 import sandxiangce from './components/sandxiangce.vue'
 import beginthreed from './components/beginthreed.vue'
+import index from './components/index.vue'
 import logo from './components/logo.vue'
 
 export default {
@@ -16,6 +18,7 @@ export default {
   components: {
     sandxiangce,
     beginthreed,
+    index,
     logo,
   },
   mounted() {

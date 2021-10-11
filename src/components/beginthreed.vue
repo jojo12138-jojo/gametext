@@ -5,7 +5,7 @@
     </div>
     <div class="table">
       <div class="item" @click="onclicka">a</div>
-      <div class="item">b</div>
+      <div class="item" @click="onclickb">b</div>
       <div class="item">c</div>
       <div class="item">d</div>
     </div>
@@ -14,7 +14,8 @@
 
 <script>
 import * as THREE from 'three'
-import tween from '@tweenjs/tween.js'
+import TWEEN from '@tweenjs/tween.js'
+import CanvasNest from 'canvas-nest.js';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls.js";
 import { CSS3DRenderer,CSS3DObject } from "three/examples/jsm/renderers/CSS3DRenderer.js"
@@ -50,7 +51,9 @@ export default {
       this.scene = new THREE.Scene(); // 创建场景
       
       // 制作卡片
-      this.createCard() 
+      this.createCard()
+      this.begin()
+      this.animate()
     },
     elestyle() {
       return {backgroundColor: 'rgba(0, 127, 127,' + (Math.random()*0.5+0.25) + ')'}
@@ -70,11 +73,18 @@ export default {
         this.button.a.push(object)
       })
     },
-    b() {
+    sphere() { // b模式
       let vector = new THREE.Vector3();
       let spherical = new THREE.Spherical();
       this.table.forEach((item, index) => {
-        
+        let phi = Math.acos(-1 + ( 2 * index) / this.table.length);
+        let theta = Math.sqrt(this.table.length * Math.PI) * phi;
+        let object = new THREE.Object3D();
+        spherical.set(800, phi, theta);
+        object.position.setFromSpherical(spherical);
+        vector.copy(object.position).multiplyScalar( 2 );
+        object.lookAt( vector );
+        this.button.b.push(object);
       })
     },
     begin() {
@@ -87,31 +97,54 @@ export default {
 			this.controls.minDistance = 500;
 			this.controls.maxDistance = 6000;
 			this.controls.addEventListener( 'change', this.render );
+      window.addEventListener( 'resize', this.onWindowResize, false );
     },
-    render() {
-      this.renderer.render(this.scene, this.camera)
+    animate() {
+      requestAnimationFrame(this.animate);
+      TWEEN.update();
+      this.controls.update();
     },
     onclicka() {
       this.transform(this.button.a, 2000)
     },
+    onclickb() {
+      this.transform(this.button.b, 2000)
+    },
+    render() {
+      this.renderer.render(this.scene, this.camera)
+    },
+    onWindowResize() {
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.render();
+    },
     transform(targets, duration) {
-      tween.removeAll();
+      TWEEN.removeAll();
       this.table.forEach((item, index) => {
         let object = this.objects[index];
         let target = targets[index]
-        new tween.Tween(object.position)
+        new TWEEN.Tween(object.position)
           .to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )
-          .easing( tween.Easing.Exponential.InOut )
+          .easing( TWEEN.Easing.Exponential.InOut )
           .start();
-        new tween.Tween(object.rotation )
+        new TWEEN.Tween(object.rotation )
           .to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )
-          .easing( tween.Easing.Exponential.InOut )
+          .easing( TWEEN.Easing.Exponential.InOut )
           .start();
       });
-      new tween.Tween(this)
+      new TWEEN.Tween(this)
         .to({}, duration*2)
         .onUpdate(this.render)
         .start();
+    },
+    zxlz() { // 粒子背景
+      const config= {
+        color: '255,0,0',
+        count: 88,
+      };
+      const cn = new CanvasNest(this.$refs.div, config);
+      cn.destroy();
     }
   },
 }

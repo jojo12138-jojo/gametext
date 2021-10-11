@@ -107,7 +107,6 @@
 		<script src="./js/TrackballControls.js"></script>
 		<script src="./js/CSS3DRenderer.js"></script>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - periodic table. <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank" rel="noopener">info</a>.</div>
 		<div id="container"></div>
 		<div id="menu">
 			<button id="table">TABLE</button>
@@ -239,17 +238,17 @@
 				"Og", "Oganesson", "(294)", 18, 7
 			];
 
-			var camera, scene, renderer;
-			var controls;
+			var camera, scene, renderer; // 相机,场景对象scene,渲染器对象
+			var controls; //控件对象
 
-			var objects = [];
-			var targets = { table: [], sphere: [], helix: [], grid: [] };
+			var objects = []; //存每一组配置数据
+			var targets = { table: [], sphere: [], helix: [], grid: [] }; //储存按钮数据
 
 			// iimg()
-			init();
+			init(); //相当于初始化
 			animate();
 
-			function iimg() {
+			function iimg() { // 艹，实际上没啥用，没得服务器是卵的
 				let requireModule = require.context('F:/博客PSD/img/创作中心', false, /\.png$/)
 				this.imagesNameArr = [];
 				for(var i = 0; i < requireModule.keys().length; i++) {
@@ -259,210 +258,147 @@
 			}
 
 			function init() {
-
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 3000;
-
-				scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 ); //用的透视相机
+				camera.position.z = 3000; // 字面意思
+				scene = new THREE.Scene(); // 创建场景对象
 
 				// table
-
 				for ( var i = 0; i < table.length; i += 5 ) {
+					var element = document.createElement( 'div' ); //创建那几个div，当作item看
+					element.className = 'element'; //添加类名
+					element.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')'; //给点随机透明度
 
-					var element = document.createElement( 'div' );
-					element.className = 'element';
-					element.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')';
-
-					var img = document.createElement( 'img' );
+					var img = document.createElement( 'img' ); //创建图片
 					img.className = 'img';
 					// img.src = 
 					element.appendChild( img );
 
-					var object = new THREE.CSS3DObject( element );
+					var object = new THREE.CSS3DObject( element ); // 随机位置
 					object.position.x = Math.random() * 4000 - 2000;
 					object.position.y = Math.random() * 4000 - 2000;
 					object.position.z = Math.random() * 4000 - 2000;
-					scene.add( object );
+					scene.add( object ); // 加入场景
+					objects.push( object ); //储存到objects里面
 
-					objects.push( object );
-
-					//
-
+					// 归位
 					var object = new THREE.Object3D();
 					object.position.x = ( table[ i + 3 ] * 140 ) - 1330;
 					object.position.y = - ( table[ i + 4 ] * 180 ) + 990;
-
 					targets.table.push( object );
-
 				}
 
 				// sphere
-
 				var vector = new THREE.Vector3();
 				var spherical = new THREE.Spherical();
-
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
 					var phi = Math.acos( -1 + ( 2 * i ) / l );
 					var theta = Math.sqrt( l * Math.PI ) * phi;
-
 					var object = new THREE.Object3D();
-
 					spherical.set( 800, phi, theta );
-
 					object.position.setFromSpherical( spherical );
-
 					vector.copy( object.position ).multiplyScalar( 2 );
-
 					object.lookAt( vector );
-
 					targets.sphere.push( object );
-
 				}
 
 				// helix
-
 				var vector = new THREE.Vector3();
 				var cylindrical = new THREE.Cylindrical();
-
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
 					var theta = i * 0.175 + Math.PI;
 					var y = - ( i * 8 ) + 450;
-
 					var object = new THREE.Object3D();
-
 					cylindrical.set( 900, theta, y );
-
 					object.position.setFromCylindrical( cylindrical );
-
 					vector.x = object.position.x * 2;
 					vector.y = object.position.y;
-					vector.z = object.position.z * 2;
-
+					vector.z = object.position.z * 2
 					object.lookAt( vector );
-
 					targets.helix.push( object );
-
 				}
 
 				// grid
-
 				for ( var i = 0; i < objects.length; i ++ ) {
-
 					var object = new THREE.Object3D();
-
 					object.position.x = ( ( i % 5 ) * 400 ) - 800;
 					object.position.y = ( - ( Math.floor( i / 5 ) % 5 ) * 400 ) + 800;
 					object.position.z = ( Math.floor( i / 25 ) ) * 1000 - 2000;
-
 					targets.grid.push( object );
-
 				}
-
-				//
-
+				
+				//渲染器配置
 				renderer = new THREE.CSS3DRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.getElementById( 'container' ).appendChild( renderer.domElement );
+				renderer.setSize( window.innerWidth, window.innerHeight ); //设置渲染区域尺寸
+				document.getElementById( 'container' ).appendChild( renderer.domElement ); //元素中插入canvas对象
 
-				//
-
+				//创建控件对象 配置
 				controls = new THREE.TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 0.5;
 				controls.minDistance = 500;
 				controls.maxDistance = 6000;
-				controls.addEventListener( 'change', render );
+				controls.addEventListener( 'change', render ); //属性变更时，重新渲染
 
+				//给4个风格添加点击事件
 				var button = document.getElementById( 'table' );
 				button.addEventListener( 'click', function ( event ) {
-
 					transform( targets.table, 2000 );
-
 				}, false );
 
 				var button = document.getElementById( 'sphere' );
 				button.addEventListener( 'click', function ( event ) {
-
 					transform( targets.sphere, 2000 );
-
 				}, false );
 				
 				var button = document.getElementById( 'helix' );
 				button.addEventListener( 'click', function ( event ) {
-
 					transform( targets.helix, 2000 );
-
 				}, false );
 
 				var button = document.getElementById( 'grid' );
 				button.addEventListener( 'click', function ( event ) {
-
 					transform( targets.grid, 2000 );
-
 				}, false );
 
-				transform( targets.table, 2000 );
-
+				transform( targets.table, 2000 );  // 初始加载table样式
 				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
+				window.addEventListener( 'resize', onWindowResize, false ); // 监听窗口变化,执行onWindowResize，重新渲染一次
 			}
 
-			function transform( targets, duration ) {
-
+			function transform( targets, duration ) { // 动画，用的tween,
 				TWEEN.removeAll();
-
 				for ( var i = 0; i < objects.length; i ++ ) {
-
 					var object = objects[ i ];
 					var target = targets[ i ];
-
 					new TWEEN.Tween( object.position )
 						.to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )
 						.easing( TWEEN.Easing.Exponential.InOut )
 						.start();
-
 					new TWEEN.Tween( object.rotation )
 						.to( { x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration )
 						.easing( TWEEN.Easing.Exponential.InOut )
 						.start();
-
 				}
-
 				new TWEEN.Tween( this )
 					.to( {}, duration * 2 )
 					.onUpdate( render )
 					.start();
-
 			}
 
-			function onWindowResize() {
-
+			function onWindowResize() { // 页面大小发生变化执行
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				render();
-
 			}
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-
+			function animate() { //动画
+				requestAnimationFrame( animate ); //逐帧执行
 				TWEEN.update();
-
 				controls.update();
-
 			}
 
-			function render() {
-
+			function render() { // 执行渲染操作   指定场景、相机作为参数
 				renderer.render( scene, camera );
-
 			}
 
 		</script>
