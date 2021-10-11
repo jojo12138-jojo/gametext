@@ -30,6 +30,7 @@ export default {
         this.imagesNameArr.push(requireModule.keys()[i].substr(2, requireModule.keys()[i].length))
         // console.log('  ', i, require('../assets/img/map' + imagesNameArr[i]))
       }
+      console.log('123')
     },
     getimg(url) {
       // console.log('123', url)
